@@ -9,15 +9,12 @@ function App() {
     <Routes>
       <Route path="/login" element={<AuthPage />} />
 
+      {/* Profile setup - accessible for both new users (registration) and authenticated users (edit) */}
+      <Route path="/profile-setup" element={<ProfileSetup />} />
+
       <Route path="/dashboard" element={
         <ProtectedRoute>
           <Dashboard />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/profile-setup" element={
-        <ProtectedRoute>
-          <ProfileSetup />
         </ProtectedRoute>
       } />
 

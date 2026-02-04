@@ -9,6 +9,8 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // Store phone temporarily for registration flow
+    const [pendingPhone, setPendingPhone] = useState(null);
 
     useEffect(() => {
         checkUserLoggedIn();
@@ -37,17 +39,56 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
     };
 
-    const login = async (mobileNumber, otp) => {
+    const sendOtp = async (phone) => {
         try {
-            const res = await api.post('/auth/verify-otp', { mobileNumber, otp });
-            if (res.data.success) {
+            // Store phone for registration flow
+            setPendingPhone(phone);
+            const res = await api.post('/auth/send-otp', { phone });
+            return res.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Failed to send OTP';
+        }
+    };
+
+    const verifyOtp = async (phone, otp) => {
+        try {
+            const res = await api.post('/auth/verify-otp', { phone, otp });
+
+            if (res.data.isNewUser) {
+                // New user - don't set auth yet, wait for registration
+                setPendingPhone(phone);
+                return { isNewUser: true };
+            } else {
+                // Existing user - set auth
                 localStorage.setItem('token', res.data.token);
                 setUser(res.data.user);
                 setIsAuthenticated(true);
-                return { success: true, isNewUser: res.data.user.isNewUser };
+                return { isNewUser: false, user: res.data.user };
             }
         } catch (error) {
-            throw error.response?.data?.message || 'Login Failed';
+            throw error.response?.data?.message || 'OTP verification failed';
+        }
+    };
+
+    const register = async (name, role) => {
+        if (!pendingPhone) {
+            throw 'Phone number not found. Please verify OTP first.';
+        }
+
+        try {
+            const res = await api.post('/auth/register', {
+                phone: pendingPhone,
+                name,
+                role
+            });
+
+            localStorage.setItem('token', res.data.token);
+            setUser(res.data.user);
+            setIsAuthenticated(true);
+            setPendingPhone(null);
+            return res.data.user;
+        } catch (error) {
+            throw error.response?.data?.message || 'Registration failed';
         }
     };
 
@@ -60,23 +101,21 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('token');
         setUser(null);
         setIsAuthenticated(false);
+        setPendingPhone(null);
     };
 
-    const sendOtp = async (mobileNumber) => {
-        try {
-            const res = await api.post('/auth/send-otp', { mobileNumber });
-            return res.data;
-        } catch (error) {
-            throw error.response?.data?.message || 'Failed to send OTP';
-        }
-    };
+    // Alias for backward compatibility
+    const login = verifyOtp;
 
     return (
         <AuthContext.Provider value={{
             user,
             loading,
             isAuthenticated,
+            pendingPhone,
             login,
+            verifyOtp,
+            register,
             logout,
             sendOtp
         }}>

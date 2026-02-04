@@ -5,10 +5,11 @@ import { useAuth } from '../context/AuthContext';
 
 const AuthPage = () => {
     const [step, setStep] = useState('MOBILE'); // MOBILE, OTP
-    const [mobileNumber, setMobileNumber] = useState('');
+    const [phone, setPhone] = useState('');
     const [otp, setOtp] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [devOtp, setDevOtp] = useState(null); // For dev mode
 
     const { login, sendOtp, isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
@@ -25,12 +26,16 @@ const AuthPage = () => {
         e.preventDefault();
         setError('');
         setIsLoading(true);
+        setDevOtp(null);
         try {
-            if (mobileNumber.length < 10) throw new Error("Invalid mobile number");
-            await sendOtp(mobileNumber);
+            if (phone.length < 10) throw new Error("Invalid mobile number");
+            const result = await sendOtp(phone);
+            if (result.devOtp) {
+                setDevOtp(result.devOtp);
+            }
             setStep('OTP');
         } catch (err) {
-            setError(err);
+            setError(typeof err === 'string' ? err : err.message || 'Failed to send OTP');
         } finally {
             setIsLoading(false);
         }
@@ -42,15 +47,17 @@ const AuthPage = () => {
         setIsLoading(true);
         try {
             if (otp.length !== 6) throw new Error("OTP must be 6 digits");
-            const { isNewUser } = await login(mobileNumber, otp);
+            const result = await login(phone, otp);
 
-            if (isNewUser) {
-                navigate('/profile-setup');
+            if (result.isNewUser) {
+                // New user - navigate to registration/profile setup
+                navigate('/profile-setup', { state: { isNewUser: true } });
             } else {
+                // Existing user - navigate to dashboard
                 navigate('/dashboard');
             }
         } catch (err) {
-            setError(err);
+            setError(typeof err === 'string' ? err : err.message || 'Verification failed');
         } finally {
             setIsLoading(false);
         }
@@ -76,8 +83,8 @@ const AuthPage = () => {
                                 <label className="block text-sm font-medium text-white mb-2">Mobile Number</label>
                                 <input
                                     type="tel"
-                                    value={mobileNumber}
-                                    onChange={(e) => setMobileNumber(e.target.value)}
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
                                     placeholder="Enter 10 digit number"
                                     className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all"
                                     autoFocus
@@ -115,13 +122,18 @@ const AuthPage = () => {
                                 <input
                                     type="text"
                                     value={otp}
-                                    onChange={(e) => setOtp(e.target.value)}
+                                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                                     placeholder="XXXXXX"
                                     maxLength={6}
                                     className="w-full px-4 py-3 rounded-lg bg-white/20 border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all text-center tracking-widest text-2xl"
                                     autoFocus
                                 />
-                                <p className="text-xs text-white/60 text-center mt-2">Check server console for Mock OTP</p>
+                                <p className="text-xs text-white/60 text-center mt-2">OTP sent to +91{phone}</p>
+                                {devOtp && (
+                                    <p className="text-sm text-green-300 text-center mt-2 bg-green-900/30 py-2 rounded">
+                                        🔧 Dev Mode: Use OTP <span className="font-mono font-bold">{devOtp}</span>
+                                    </p>
+                                )}
                             </div>
                             {error && <p className="text-red-300 text-sm text-center">{error}</p>}
                             <button

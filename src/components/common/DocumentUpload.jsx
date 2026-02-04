@@ -2,35 +2,42 @@ import { useState } from 'react';
 import api from '../../utils/api';
 
 const DocumentUpload = ({ onUploadSuccess }) => {
-    const [file, setFile] = useState(null);
+    const [documentType, setDocumentType] = useState('aadhaar');
+    const [documentNumber, setDocumentNumber] = useState('');
     const [uploading, setUploading] = useState(false);
     const [message, setMessage] = useState('');
 
-    const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-    };
+    const documentTypes = [
+        { value: 'aadhaar', label: 'Aadhaar Card' },
+        { value: 'pan', label: 'PAN Card' },
+        { value: 'voter_id', label: 'Voter ID' },
+        { value: 'driving_license', label: 'Driving License' },
+        { value: 'passport', label: 'Passport' },
+    ];
 
     const handleUpload = async () => {
-        if (!file) return;
-
-        const formData = new FormData();
-        formData.append('document', file);
+        if (!documentNumber.trim()) {
+            setMessage('Please enter document number');
+            return;
+        }
 
         setUploading(true);
         setMessage('');
 
         try {
-            await api.post('/users/upload-document', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
+            await api.post('/users/upload-documents', {
+                documents: [{
+                    type: documentType,
+                    number: documentNumber,
+                    uploadedAt: new Date().toISOString()
+                }]
             });
-            setMessage('Upload successful!');
-            setFile(null);
+            setMessage('Document submitted for verification!');
+            setDocumentNumber('');
             if (onUploadSuccess) onUploadSuccess();
         } catch (error) {
             console.error(error);
-            setMessage('Upload failed. Please try again.');
+            setMessage(error.response?.data?.message || 'Upload failed. Please try again.');
         } finally {
             setUploading(false);
         }
@@ -38,29 +45,51 @@ const DocumentUpload = ({ onUploadSuccess }) => {
 
     return (
         <div className="bg-white p-6 rounded-xl shadow-sm border border-dashed border-gray-300">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Upload ID/Verification Document</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Submit Verification Documents</h3>
             <div className="space-y-4">
-                <input
-                    type="file"
-                    onChange={handleFileChange}
-                    accept="image/*,application/pdf"
-                    className="block w-full text-sm text-gray-500
-                    file:mr-4 file:py-2 file:px-4
-                    file:rounded-full file:border-0
-                    file:text-sm file:font-semibold
-                    file:bg-green-50 file:text-green-700
-                    hover:file:bg-green-100"
-                />
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Document Type</label>
+                    <select
+                        value={documentType}
+                        onChange={(e) => setDocumentType(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    >
+                        {documentTypes.map((type) => (
+                            <option key={type.value} value={type.value}>
+                                {type.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
-                {message && <p className={`text-sm ${message.includes('success') ? 'text-green-600' : 'text-red-500'}`}>{message}</p>}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Document Number</label>
+                    <input
+                        type="text"
+                        value={documentNumber}
+                        onChange={(e) => setDocumentNumber(e.target.value)}
+                        placeholder="Enter document number"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+                    />
+                </div>
+
+                {message && (
+                    <p className={`text-sm ${message.includes('success') || message.includes('submitted') ? 'text-green-600' : 'text-red-500'}`}>
+                        {message}
+                    </p>
+                )}
 
                 <button
                     onClick={handleUpload}
-                    disabled={!file || uploading}
+                    disabled={!documentNumber.trim() || uploading}
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                 >
-                    {uploading ? 'Uploading...' : 'Upload Document'}
+                    {uploading ? 'Submitting...' : 'Submit for Verification'}
                 </button>
+
+                <p className="text-xs text-gray-500 text-center">
+                    Your documents will be reviewed by our team. Verification usually takes 24-48 hours.
+                </p>
             </div>
         </div>
     );
