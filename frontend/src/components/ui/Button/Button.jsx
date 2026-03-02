@@ -7,7 +7,7 @@ import styles from './Button.module.css';
  * Touch-friendly, accessible button with variants
  * 
  * @param {Object} props
- * @param {'primary' | 'secondary' | 'outline'} props.variant - Button style variant
+ * @param {'primary' | 'secondary' | 'outline' | 'danger'} props.variant - Button style variant
  * @param {'sm' | 'md' | 'lg'} props.size - Button size
  * @param {boolean} props.isLoading - Show loading spinner
  * @param {boolean} props.disabled - Disable button
@@ -49,7 +49,7 @@ export default function Button({
             {isLoading ? (
                 <span className={styles.spinner} aria-hidden="true" />
             ) : null}
-            <span className={isLoading ? styles.hiddenText : ''}>
+            <span className={`${styles.content} ${isLoading ? styles.hiddenText : ''}`}>
                 {children}
             </span>
         </button>

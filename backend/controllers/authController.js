@@ -1,5 +1,6 @@
 // Import authentication business logic module
 const authModule = require('../modules/authModule');
+const db = require('../config/db');
 
 /**
  * POST /api/auth/register
@@ -152,7 +153,21 @@ async function getMe(req, res) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        res.json({ user });
+        // Also fetch location from user_locations table
+        const locResult = await db.query('SELECT * FROM user_locations WHERE user_id = $1', [req.user.id]);
+        const location = locResult.rows[0] || {};
+
+        res.json({
+            user: {
+                ...user,
+                location: {
+                    state: location.state || '',
+                    district: location.district || '',
+                    lat: location.lat || null,
+                    lng: location.lng || null,
+                },
+            },
+        });
 
     } catch (err) {
         console.error('getMe error:', err);

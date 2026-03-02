@@ -1,0 +1,29 @@
+name: Farmer Connect Deploy
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Generate deployment package
+        run: |
+          cd backend
+          zip -r ../deploy.zip . -x "node_modules/*" ".git/*"
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.ACCESSKEYID }}
+          aws_secret_key: ${{ secrets.SECRETACCESSKEY }}
+          application_name: AgroNexus
+          environment_name: AgroNexus-env
+          version_label: "backend-${{ github.sha }}"
+          region: ${{ secrets.AWSREGION }}
+          deployment_package: deploy.zip
+          use_existing_version_if_available: true

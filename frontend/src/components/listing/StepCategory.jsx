@@ -1,7 +1,7 @@
 'use client';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { updateFormData, nextStep } from '@/lib/store/features/listingSlice';
+import { updateFormData, nextStep } from '@/store/slices/listingSlice';
 import { Apple, Wheat, Carrot, Milk, Flower, Sprout } from 'lucide-react';
 
 const CATEGORIES = [

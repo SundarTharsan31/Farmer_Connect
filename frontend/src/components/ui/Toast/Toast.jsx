@@ -6,6 +6,7 @@ import { X, CheckCircle, AlertCircle, Info } from 'lucide-react';
 
 // Simple event bus for toasts
 const listeners = new Set();
+let toastIdCounter = 0;
 export const toast = {
     success: (message) => notify('success', message),
     error: (message) => notify('error', message),
@@ -15,7 +16,7 @@ export const toast = {
 export const showToast = (message, type = 'info') => notify(type, message);
 
 const notify = (type, message) => {
-    listeners.forEach(listener => listener({ type, message, id: Date.now() }));
+    listeners.forEach(listener => listener({ type, message, id: ++toastIdCounter }));
 };
 
 export function ToastContainer() {

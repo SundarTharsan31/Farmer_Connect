@@ -75,6 +75,14 @@
             "reset": "फ़िल्टर रीसेट करें",
             "active": "सक्रिय फ़िल्टर:"
         },
+        "regions": {
+            "maharashtra": "महाराष्ट्र",
+            "punjab": "पंजाब",
+            "madhyaPradesh": "मध्य प्रदेश",
+            "karnataka": "कर्नाटक",
+            "tamilNadu": "तमिल नाडु",
+            "gujarat": "गुजरात"
+        },
         "searchPlaceholder": "फसलें, किसान खोजें...",
         "noCrops": {
             "title": "कोई फसल नहीं मिली",
@@ -398,7 +406,9 @@
             "title": "नई लिस्टिंग",
             "uploadImage": "फसल की तस्वीर अपलोड करें",
             "imageSupport": "JPG, PNG समर्थित",
-            "cropType": "फसल का प्रकार",
+            "cropName": "फसल का नाम",
+            "category": "श्रेणी",
+            "selectCategory": "श्रेणी चुनें",
             "selectCrop": "फसल चुनें",
             "variety": "किस्म (वैकल्पिक)",
             "varietyPlaceholder": "जैसे लाल, हाइब्रिड",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateFormData, nextStep, setLocation } from '@/lib/store/features/listingSlice';
+import { updateFormData, nextStep, setLocation } from '@/store/slices/listingSlice';
 import { MapPin, ArrowRight, Crosshair, Search, Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 

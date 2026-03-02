@@ -55,16 +55,17 @@ async function getProfile(userId) {
  * Update user profile (name, address, etc.)
  */
 async function updateProfile(userId, data) {
-    const { name, address } = data;
+    const { name, address, mobile } = data;
 
     const result = await db.query(
         `UPDATE users SET 
             name = COALESCE($1, name),
             address = COALESCE($2, address),
+            mobile = COALESCE($3, mobile),
             updated_at = NOW()
-         WHERE id = $3
+         WHERE id = $4
          RETURNING *`,
-        [name, address, userId]
+        [name, address, mobile, userId]
     );
 
     if (result.rows.length === 0) return null;

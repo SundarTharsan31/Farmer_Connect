@@ -31,8 +31,18 @@ export default function EditListingPage({ params }) {
         { value: 'Cotton', label: t('listing.crops.cotton') || 'Cotton' },
     ];
 
+    const CATEGORY_OPTIONS = [
+        { value: 'vegetables', label: t('categories.vegetables') || 'Vegetables' },
+        { value: 'fruits', label: t('categories.fruits') || 'Fruits' },
+        { value: 'grains', label: t('categories.grains') || 'Grains' },
+        { value: 'spices', label: t('categories.spices') || 'Spices' },
+        { value: 'flowers', label: t('categories.flowers') || 'Flowers' },
+        { value: 'dairy', label: t('categories.dairy') || 'Dairy' },
+    ];
+
     const [formData, setFormData] = useState({
         crop: '',
+        category: '',
         variety: '',
         quantity: '',
         price: '',
@@ -69,6 +79,7 @@ export default function EditListingPage({ params }) {
 
                 setFormData({
                     crop: cropName,
+                    category: listing.category || '',
                     variety: variety,
                     quantity: qty,
                     price: price,
@@ -100,7 +111,7 @@ export default function EditListingPage({ params }) {
         try {
             const updates = {
                 cropName: `${formData.crop} ${formData.variety ? `(${formData.variety})` : ''}`.trim(),
-                category: 'vegetables',
+                category: formData.category || 'vegetables',
                 variety: formData.variety || '',
                 quantity: parseFloat(formData.quantity),
                 unit: 'kg',
@@ -153,7 +164,7 @@ export default function EditListingPage({ params }) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Select
-                            label={t('listing.new.cropType')}
+                            label={t('listing.new.cropName')}
                             placeholder={t('listing.new.selectCrop')}
                             options={CROP_TYPES}
                             value={formData.crop}
@@ -166,6 +177,15 @@ export default function EditListingPage({ params }) {
                             onChange={(e) => setFormData(prev => ({ ...prev, variety: e.target.value }))}
                         />
                     </div>
+
+                    <Select
+                        label={t('listing.new.category') || 'Category'}
+                        placeholder={t('listing.new.selectCategory') || 'Select a category'}
+                        options={CATEGORY_OPTIONS}
+                        value={formData.category}
+                        onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                        required
+                    />
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Input

@@ -10,6 +10,7 @@ const { check } = require('express-validator');
 const updateProfileValidation = [
     check('name').optional().notEmpty().withMessage('Name cannot be empty'),
     check('email').optional().isEmail().withMessage('Invalid email format'),
+    check('mobile').optional().notEmpty().withMessage('Mobile cannot be empty'),
 ];
 
 // GET user profile

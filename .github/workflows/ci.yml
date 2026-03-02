@@ -1,0 +1,79 @@
+name: Farmer Connect CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─── Backend ────────────────────────────────────────────────
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      BACKEND_ENV: ${{ secrets.BACKEND_ENV }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create .env file from secret
+        run: echo "$BACKEND_ENV" > .env
+
+      - name: Start server (smoke test)
+        run: |
+          node server.js &
+          SERVER_PID=$!
+          sleep 5
+
+          # Health-check – adjust the path if you have a dedicated /health route
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5001/health || true)
+
+          kill $SERVER_PID 2>/dev/null || true
+
+          if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 400 ]; then
+            echo "✅ Server responded with HTTP $STATUS"
+          else
+            echo "❌ Server responded with HTTP $STATUS"
+            exit 1
+          fi
+
+  # ─── Frontend ───────────────────────────────────────────────
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build

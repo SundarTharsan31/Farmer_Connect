@@ -3,7 +3,7 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Check } from 'lucide-react';
-import { prevStep } from '@/lib/store/features/listingSlice';
+import { prevStep } from '@/store/slices/listingSlice';
 
 // Steps will be imported here
 import StepCategory from './StepCategory';

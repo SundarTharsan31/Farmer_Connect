@@ -1,6 +1,5 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 
 // Import translations
 import enCommon from '../../public/locales/en/common.json';
@@ -27,23 +26,40 @@ const resources = {
     hr: { common: hrCommon },
 };
 
+// Always initialise with lng='en' so that both server and client produce
+// identical HTML on the first render, preventing hydration mismatches.
+// After hydration, we read the user's preferred language from localStorage
+// and switch to it, triggering a client-only re-render.
 i18n
-    .use(LanguageDetector)
     .use(initReactI18next)
     .init({
         resources,
+        lng: 'en',
         fallbackLng: 'en',
         defaultNS: 'common',
         ns: ['common'],
-
-        detection: {
-            order: ['localStorage', 'navigator'],
-            caches: ['localStorage'],
-        },
 
         interpolation: {
             escapeValue: false, // React already escapes
         },
     });
+
+// Post-hydration language detection (client only)
+if (typeof window !== 'undefined') {
+    // Use requestIdleCallback (or setTimeout fallback) so this runs
+    // after React has finished hydrating the page.
+    const detect = () => {
+        const saved = localStorage.getItem('i18nextLng');
+        if (saved && saved !== 'en' && resources[saved]) {
+            i18n.changeLanguage(saved);
+        }
+    };
+
+    if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(detect);
+    } else {
+        setTimeout(detect, 0);
+    }
+}
 
 export default i18n;

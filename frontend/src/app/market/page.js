@@ -15,12 +15,12 @@ import { translateCropName } from '@/utils/translateCropName';
 // Regions
 const REGIONS = [
     { value: 'all', labelKey: 'market.filters.allIndia' },
-    { value: 'Maharashtra', label: 'Maharashtra' },
-    { value: 'Punjab', label: 'Punjab' },
-    { value: 'Madhya Pradesh', label: 'Madhya Pradesh' },
-    { value: 'Karnataka', label: 'Karnataka' },
-    { value: 'Tamil Nadu', label: 'Tamil Nadu' },
-    { value: 'Gujarat', label: 'Gujarat' },
+    { value: 'Maharashtra', labelKey: 'market.regions.maharashtra' },
+    { value: 'Punjab', labelKey: 'market.regions.punjab' },
+    { value: 'Madhya Pradesh', labelKey: 'market.regions.madhyaPradesh' },
+    { value: 'Karnataka', labelKey: 'market.regions.karnataka' },
+    { value: 'Tamil Nadu', labelKey: 'market.regions.tamilNadu' },
+    { value: 'Gujarat', labelKey: 'market.regions.gujarat' },
 ];
 
 const CATEGORIES = ['vegetables', 'fruits', 'grains', 'spices', 'flowers'];

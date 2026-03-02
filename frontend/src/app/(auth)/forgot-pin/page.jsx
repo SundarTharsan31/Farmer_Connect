@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -11,6 +11,14 @@ import { showToast } from '@/components/ui/Toast/Toast';
 import Link from 'next/link';
 
 export default function ForgotPinPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div></div>}>
+            <ForgotPinContent />
+        </Suspense>
+    );
+}
+
+function ForgotPinContent() {
     const { t } = useTranslation('common');
     const dispatch = useDispatch();
     const router = useRouter();

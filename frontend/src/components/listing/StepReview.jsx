@@ -2,7 +2,7 @@
 
 import { useSelector, useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
-import { resetListing } from '@/lib/store/features/listingSlice';
+import { resetListing } from '@/store/slices/listingSlice';
 import { CheckCircle, MapPin, Package, Tag, Star } from 'lucide-react';
 import { useState } from 'react';
 import { ApiService } from '@/services/apiService';

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateFormData, nextStep, prevStep } from '../../lib/store/features/listingSlice';
+import { updateFormData, nextStep, prevStep } from '@/store/slices/listingSlice';
 import VoiceInput from '../ui/VoiceInput/VoiceInput';
 import { ArrowRight } from 'lucide-react';
 

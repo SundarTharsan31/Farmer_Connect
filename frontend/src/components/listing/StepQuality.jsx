@@ -1,7 +1,7 @@
 'use client';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { updateFormData, nextStep, addImage, removeImage } from '@/lib/store/features/listingSlice';
+import { updateFormData, nextStep, addImage, removeImage } from '@/store/slices/listingSlice';
 import ImageCapture from './ImageCapture';
 import { ArrowRight, Star } from 'lucide-react';
 
